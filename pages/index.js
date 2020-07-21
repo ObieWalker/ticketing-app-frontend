@@ -12,10 +12,8 @@ export default function Home({homeData}) {
       </Head>
       <section className={utilStyles.headingMd}>
         <p>{homeData.params.title}</p>
-        <p>
           <p>To Login, click <Link href="/auth/login"><a>Login</a></Link></p>
-          <p>To regiter, click <Link href="/auth/register"><a>Register</a></Link></p>
-        </p>
+          <p>To register, click <Link href="/auth/register"><a>Register</a></Link></p>
         <Link href="/posts/[id]" as={`/posts/${homeData.params.id}`}>
           <a>{homeData.params.title}</a>
         </Link>

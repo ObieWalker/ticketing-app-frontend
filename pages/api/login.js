@@ -1,0 +1,36 @@
+import axios from 'axios';
+import { serialize } from "cookie";
+import httpClient from '../helpers/httpClient'
+import {asyncHandler} from '../helpers/customMethods'
+
+export default async function loginAuth(req, res) {
+
+  const promise = httpClient.post("/sessions", req.body.values)
+  const { ok, response, error } = await asyncHandler(promise);
+
+  if (ok) {
+    res.setHeader('Set-Cookie', serialize('token', response.data.token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV !== 'development',
+      sameSite: 'none',
+      maxAge: 3600,
+      path: '/'
+    }))
+    httpClient.setAuthorizationToken(response.data.token)
+    res.json({
+      token: response.data.token,
+      message: response.data.message,
+      status: 200
+    })
+  }
+  else {
+    res.json({
+      message: error.response.data.message,
+      status: error.response.status
+    })
+  }
+}
+
+export {
+  loginAuth
+}

@@ -11,9 +11,3 @@ export async function asyncHandler(promise) {
       error,
     }));
 }
-
-export function getToken() {
-  const token = localStorage.getItem('token')
-  if (token) return token
-  return
-}

@@ -1,8 +1,9 @@
-import httpClient from '../helpers/httpClient'
-import {asyncHandler} from '../helpers/customMethods'
+import httpClient from '../../helpers/httpClient'
+import {asyncHandler} from '../../helpers/customMethods'
 
 export default async function getUser(req, res) {
   
+  // console.log("req.headers>>>", req.headers)
   const promise = httpClient.get("/users/id")
   const { ok, response, error } = await asyncHandler(promise);
 
@@ -12,7 +13,7 @@ export default async function getUser(req, res) {
     })
   }
   else {
-    res.json({
+    res.status(error.response.status).json({
       message: error.response.data.message,
       status: error.response.status
     })

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { serialize } from "cookie";
-import httpClient from '../helpers/httpClient'
-import {asyncHandler} from '../helpers/customMethods'
+import httpClient from '../../helpers/httpClient'
+import {asyncHandler} from '../../helpers/customMethods'
 
 export default async function loginAuth(req, res) {
 
@@ -9,17 +9,17 @@ export default async function loginAuth(req, res) {
   const { ok, response, error } = await asyncHandler(promise);
 
   if (ok) {
-    res.setHeader('Set-Cookie', serialize('token', response.data.token, {
-      httpOnly: true,
+    const { attributes } = response.data.data
+    res.setHeader('Set-Cookie', serialize('token', attributes.token, {
+      // httpOnly: true,
       secure: process.env.NODE_ENV !== 'development',
       sameSite: 'none',
       maxAge: 3600,
       path: '/'
     }))
-    httpClient.setAuthorizationToken(response.data.token)
+    httpClient.setAuthorizationToken(attributes.token)
     res.json({
-      token: response.data.token,
-      message: response.data.message,
+      user: attributes,
       status: 200
     })
   }

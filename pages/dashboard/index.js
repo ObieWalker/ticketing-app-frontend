@@ -1,33 +1,33 @@
 import React from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+import nextCookie from "next-cookies";
 import useSWR from 'swr'
-// import fetch from 'isomorphic-unfetch'
-import { useRouter } from 'next/router'
+import { connect } from 'react-redux'
+import Router from 'next/router'
 import Error from 'next/error';
-import {getToken} from '../helpers/customMethods'
-import {getCookieValue} from '../helpers/cookieHelper'
-import { getCookie } from '../utils/cookieUtil'
-import { useCurrentUser, getUser } from '../../lib/hooks'
+import {getToken} from '../../helpers/customMethods'
+import { getCookie } from '../../utils/cookieUtil'
+import { withAuthSync } from '../../utils/auth'
 
+const Dashboard = (props) => {
 
-
-export default function Dashboard({user}) {
+  const { username, email, role } = props.user
 
   return (
     <>
       <Head>
-        <title>{user.username}</title>
+        <title>{username}</title>
       </Head>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <section>
           <div>
-            <h2> Hi {user.username}</h2>
+            <h2> Hi {username}</h2>
 
           </div>
           Bio
           Email
-          <p> {user.email} </p>
+          <p> {email} </p>
         </section>
       </div>
       <div>
@@ -37,17 +37,38 @@ export default function Dashboard({user}) {
   );
 }
 
-export async function getServerSideProps({req}) {
-  const cookie = req?.headers?.cookie
-  let token
-  if (cookie) token = getCookieValue(cookie, "token")
-  const res = await fetch('http://localhost:3000/api/getUser', {
-    headers: {
-      token
+Dashboard.getInitialProps =  async ctx => {
+  const {token} = nextCookie(ctx)
+  const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
+
+  const apiUrl = process.browser
+    ? `${protocol}://${window.location.host}/api/getUser`
+    : `${protocol}://${ctx.req.headers.host}/api/getUser`;
+
+
+  const redirectOnError = () => {
+    process.browser
+      ? Router.push("/auth/login")
+      : ctx.res.writeHead(301, { Location: "/auth/login" });
+  }
+
+  try {
+    const response = await fetch(apiUrl, {
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        token: token
+      }
+    });
+
+    if (response.ok) {
+      return await response.json();
+    } else {
+      return redirectOnError();
     }
-  })
-  const json = await res.json()
-  return { props: 
-    { user: json.user }
+  } catch (error) {
+    return redirectOnError();
   }
 }
+
+export default connect((state) => state)(withAuthSync(Dashboard))

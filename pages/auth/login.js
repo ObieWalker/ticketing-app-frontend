@@ -1,9 +1,11 @@
 import Link from 'next/link'
 import Head from 'next/head'
-import { useRouter} from 'next/router'
+import Router from 'next/router'
+import cookie from 'js-cookie';
 import { useFormik } from 'formik';
 import * as yup from "yup"
-import httpClient from '../helpers/httpClient'
+import { signInUser, currentUser} from '../../lib/actions/userActions'
+import httpClient from '../../helpers/httpClient'
 import Layout from '../../components/layout'
 import utilStyles from '../../styles/utils.module.css'
 import { useState } from 'react';
@@ -23,7 +25,6 @@ const validationSchema = yup.object().shape({
 
 export default function Login() {
 
-  const router = useRouter()
   const [loginError, setLoginError] = useState(null)
   const handleLogin = async (user) => {
     const values = { user }
@@ -39,7 +40,10 @@ export default function Login() {
     const json = await resp.json()
 
     if (json.status == 200) {
-      router.push('/dashboard')
+      signInUser(json)
+      currentUser(json)
+      cookie.set("token", json.user.token, { expires: 600 });
+      Router.push('/dashboard')
     } else {
       setLoginError(json.message)
     }

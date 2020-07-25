@@ -3,9 +3,9 @@ import { serialize } from "cookie";
 import httpClient from '../../helpers/httpClient'
 import {asyncHandler} from '../../helpers/customMethods'
 
-export default async function loginAuth(req, res) {
+export default async function registerAuth(req, res) {
 
-  const promise = httpClient.post("/sessions", req.body)
+  const promise = httpClient.post("/users", req.body)
   const { ok, response, error } = await asyncHandler(promise);
 
   if (ok) {
@@ -20,7 +20,7 @@ export default async function loginAuth(req, res) {
     httpClient.setAuthorizationToken(attributes.token)
     res.json({
       user: attributes,
-      status: 200
+      status: 201
     })
   }
   else {

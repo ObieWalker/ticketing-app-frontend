@@ -37,7 +37,9 @@ const Dashboard = (props) => {
   );
 }
 
-Dashboard.getInitialProps =  async ctx => {
+Dashboard.getInitialProps = async (ctx) => {
+  // const state = reduxStore.getState()
+  // console.log("state>>>", ctx.store.getState())
   const {token} = nextCookie(ctx)
   const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
 

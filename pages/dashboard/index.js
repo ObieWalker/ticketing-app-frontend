@@ -12,7 +12,7 @@ import { withAuthSync } from '../../utils/auth'
 
 const Dashboard = (props) => {
 
-  const { username, email, role } = props.user
+  const { username, email, role } = props.user.user
 
   return (
     <>
@@ -37,7 +37,9 @@ const Dashboard = (props) => {
   );
 }
 
-Dashboard.getInitialProps =  async ctx => {
+Dashboard.getInitialProps = async (ctx) => {
+  const { user } =  ctx.store.getState()
+  if (user.authenticated) return user
   const {token} = nextCookie(ctx)
   const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
 

@@ -1,14 +1,15 @@
 import Link from 'next/link'
 import Head from 'next/head'
+import { useState } from 'react';
 import Router from 'next/router'
 import cookie from 'js-cookie';
 import { useFormik } from 'formik';
 import * as yup from "yup"
-import { signInUser, currentUser} from '../../lib/actions/userActions'
-import httpClient from '../../helpers/httpClient'
+import { useDispatch } from 'react-redux'
+import { setUser } from '../../lib/actions/userActions'
+import LoginForm from '../../components/auth/loginForm'
 import Layout from '../../components/layout'
 import utilStyles from '../../styles/utils.module.css'
-import { useState } from 'react';
 
 const validationSchema = yup.object().shape({
   email: yup
@@ -25,23 +26,22 @@ const validationSchema = yup.object().shape({
 
 export default function Login() {
 
+  const dispatch =  useDispatch();
   const [loginError, setLoginError] = useState(null)
   const handleLogin = async (user) => {
-    const values = { user }
     const resp = await fetch('http://localhost:3000/api/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        values
+        user: user
       })
     })
     const json = await resp.json()
 
     if (json.status == 200) {
-      signInUser(json)
-      currentUser(json)
+      dispatch(setUser(json))
       cookie.set("token", json.user.token, { expires: 600 });
       Router.push('/dashboard')
     } else {
@@ -62,29 +62,17 @@ export default function Login() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className={utilStyles.form}>
-        {loginError && loginError}
-        <form onSubmit={handleSubmit}>
-          <input
-            className={utilStyles.formInput}
-            type="text"
-            onChange={handleChange}
-            defaultValue={values.email}
-            name="email"
+        <p className={utilStyles.errorMessage}>
+          {loginError && loginError}
+        </p>
+        <LoginForm
+          onSubmit={handleSubmit}
+          errors={errors}
+          values={values}
+          onChange={handleChange}
           />
-          {errors.email && errors.email}
-          <input
-            className={utilStyles.formInput}
-            type="password"
-            onChange={handleChange}
-            defaultValue={values.password}
-            name="password"
-          />
-          {errors.password && errors.password}
-          <button className={utilStyles.formButton} type="submit">Login</button>
-        </form>
         <p>To register, click <Link href="/auth/register"><a>Register</a></Link></p>
       </div>
-
     </Layout>
   )
 }

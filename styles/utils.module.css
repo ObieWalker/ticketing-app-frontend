@@ -85,5 +85,9 @@
   text-align: center;
   display: inline-block;
   margin-left: 120px;
+}
 
+.errorMessage {
+  color: red;
+  font-size: xx-large;
 }

@@ -1,9 +1,8 @@
-import axios from 'axios';
 import { serialize } from "cookie";
 import httpClient from '../../helpers/httpClient'
 import {asyncHandler} from '../../helpers/customMethods'
 
-export default async function loginAuth(req, res) {
+export default async (req, res) => {
 
   const promise = httpClient.post("/sessions", req.body)
   const { ok, response, error } = await asyncHandler(promise);

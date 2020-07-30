@@ -6,32 +6,33 @@ import useSWR from 'swr'
 import { connect } from 'react-redux'
 import Router from 'next/router'
 import Error from 'next/error';
-import {getToken} from '../../helpers/customMethods'
+import { userRoleName } from '../../utils/formatUtil';
 import { getCookie } from '../../utils/cookieUtil'
 import { withAuthSync } from '../../utils/auth'
+import MakeRequest from '../../components/request/MakeRequest'
+import ViewRequests from '../../components/request/ViewRequests'
+import { titleize } from '../../utils/formatUtil'
+
 
 const Dashboard = (props) => {
 
-  const { username, email, role } = props.user.user
+  const { username, role } = props.user.user
 
   return (
     <>
       <Head>
-        <title>{username}</title>
+      <link rel="icon" href="/favicon.ico" />
+        <title>{titleize(username)}'s Dashboard</title>
       </Head>
       <div style={{ display: 'flex', alignItems: 'center' }}>
-        <section>
+        <section style={{ width: '100%' }}>
           <div>
-            <h2> Hi {username}</h2>
-
+            <h2>{userRoleName(role)} Page.</h2>
+            <MakeRequest />
+            <hr />
+            <ViewRequests />
           </div>
-          Bio
-          Email
-          <p> {email} </p>
         </section>
-      </div>
-      <div>
-        <h3>My posts</h3>
       </div>
     </>
   );

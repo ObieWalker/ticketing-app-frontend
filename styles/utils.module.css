@@ -157,8 +157,9 @@
 }
 
 .requestsView {
-  margin: 2% 10%;
+  margin: 2%;
   text-align: center;
+  overflow: auto;
 }
 
 .showClass {
@@ -298,4 +299,27 @@
   position: relative;
   margin: auto;
   padding: 1rem;
+}
+
+.searchBox input[type=text]{
+  margin: 1rem;
+  max-width: 300px;
+  padding: 10px;
+  font-size: 17px;
+  border: 1px solid grey;
+  width: 50%;
+  background: #f1f1f1;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.searchBox::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+.radioButtons {
+  display: inline-flex;
+  margin: 1rem
 }

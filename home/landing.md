@@ -3,7 +3,9 @@ title: 'What this app does'
 date: '2020-07-21'
 ---
 
-This is an application that can be used by:
+This is an app built using Next.js implementing server side rendering for better Search Engine Optimization and a quicker response time for the user. 
+
+This application that can be used by:
 - a customer
 - an agent
 - an admin.

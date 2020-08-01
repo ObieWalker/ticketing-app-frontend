@@ -8,7 +8,7 @@ import * as yup from "yup"
 import { useDispatch } from 'react-redux'
 import { setUser } from '../../lib/actions/userActions'
 import RegisterForm from '../../components/auth/registerForm'
-import Layout from '../../components/layout'
+import Layout from '../../components/layout/layout'
 import utilStyles from '../../styles/utils.module.css'
 
 const validationSchema = yup.object().shape({

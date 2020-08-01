@@ -63,18 +63,20 @@ export default function RequestModal({ handleClose, show, children, comments, us
         <hr />
         <h2>{request_title}</h2>
         <div className={utilStyles.modalRequest}>{request_body}</div>
-        <div className={utilStyles.commentsBox}>
           { comments && comments.length > 0 &&
-            comments.map((comment, i) => (
-            <React.Fragment key={i}>
-              <span>{comment.comment}</span>
-              <span> - {handleCommenter(comment.user_id)}</span>
-              <hr />
-            </React.Fragment>
-            )
-          )
+          
+            <div className={utilStyles.commentsBox}>
+              {
+                comments.map((comment, i) => (
+                  <React.Fragment key={i}>
+                    <span>{comment.comment}</span>
+                    <span> - {handleCommenter(comment.user_id)}</span>
+                    <hr />
+                  </React.Fragment>
+                ))
+              }
+            </div>
           }
-        </div>
         { renderCommentBox(user.role, comments.length) &&
           <form onSubmit={handleSubmit} className={utilStyles}>
 

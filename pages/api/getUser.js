@@ -1,18 +1,21 @@
 import httpClient from '../../helpers/httpClient'
 import {asyncHandler} from '../../helpers/customMethods'
 
-export default async function getUser(req, res) {
+export default async (req, res) => {
   
+  httpClient.setAuthorizationToken(req.headers.token)
   const promise = httpClient.get("/users/id")
   const { ok, response, error } = await asyncHandler(promise);
 
   if (ok) {
-    res.status(200).json({
-      user: response.data.user,
+    const { attributes } = response.data.data
+    res.json({
+      user: attributes,
+      status: 200
     })
   }
   else {
-    res.status(error.response.status).json({
+    res.json({
       message: error.response.data.message,
       status: error.response.status
     })

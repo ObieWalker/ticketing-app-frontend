@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import Date from '../../components/date'
-import Layout from '../../components/layout'
+import Layout from '../../components/layout/layout';
 import { getPostData, getAllPostIds } from '../../lib/landing'
 import utilStyles from '../../styles/utils.module.css'
 

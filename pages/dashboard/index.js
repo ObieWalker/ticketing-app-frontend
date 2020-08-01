@@ -1,9 +1,8 @@
 import React from 'react';
 import Head from 'next/head';
-import Link from 'next/link';
+import { useEffect } from 'react';
 import nextCookie from "next-cookies";
-import useSWR from 'swr'
-import { connect } from 'react-redux'
+import { connect, useDispatch, useSelector } from 'react-redux'
 import Router from 'next/router'
 import Error from 'next/error';
 import { userRoleName } from '../../utils/formatUtil';
@@ -12,17 +11,56 @@ import { withAuthSync } from '../../utils/auth'
 import MakeRequest from '../../components/request/MakeRequest'
 import ViewRequests from '../../components/request/ViewRequests'
 import { titleize } from '../../utils/formatUtil'
+import { setUser } from '../../lib/actions/userActions'
+import DashboardLayout from '../../components/layout/DashboardLayout'
 
 
-const Dashboard = (props) => {
+const Dashboard = () => {
 
-  const { username, role } = props.user.user
+  const dispatch =  useDispatch();
+
+  const { user } = useSelector(state => state.user)
+
+  useEffect(() => {
+    const token = getCookie("token")
+    if (!token) redirectOnError()
+    getUser(token)
+   }, [])
+
+  const getUser = async (token) => {
+
+    const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
+
+    const apiUrl = `${protocol}://${window.location.host}/api/getUser`
+    try {
+      const response = await fetch(apiUrl, {
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          token: token
+        }
+      });
+      const json =  await response.json()
+      if (json.status == 200) {
+        dispatch(setUser(json))
+      } else {
+        return redirectOnError();
+      }
+    } catch (error) {
+      return redirectOnError();
+    }
+  }
+
+  const redirectOnError = () => {
+    Router.push("/auth/login")
+  }
+  const { username, role } = user
 
   return (
-    <>
+    <DashboardLayout>
       <Head>
       <link rel="icon" href="/favicon.ico" />
-        <title>{titleize(username)}'s Dashboard</title>
+      <title>{username && `${titleize(username)}'s`} Dashboard </title>
       </Head>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <section style={{ width: '100%' }}>
@@ -34,44 +72,8 @@ const Dashboard = (props) => {
           </div>
         </section>
       </div>
-    </>
+    </DashboardLayout>
   );
-}
-
-Dashboard.getInitialProps = async (ctx) => {
-  const { user } =  ctx.store.getState()
-  if (user.authenticated) return user
-  const {token} = nextCookie(ctx)
-  const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
-
-  const apiUrl = process.browser
-    ? `${protocol}://${window.location.host}/api/getUser`
-    : `${protocol}://${ctx.req.headers.host}/api/getUser`;
-
-
-  const redirectOnError = () => {
-    process.browser
-      ? Router.push("/auth/login")
-      : ctx.res.writeHead(301, { Location: "/auth/login" });
-  }
-
-  try {
-    const response = await fetch(apiUrl, {
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        token: token
-      }
-    });
-
-    if (response.ok) {
-      return await response.json();
-    } else {
-      return redirectOnError();
-    }
-  } catch (error) {
-    return redirectOnError();
-  }
 }
 
 export default connect((state) => state)(withAuthSync(Dashboard))

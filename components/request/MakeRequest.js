@@ -1,10 +1,9 @@
 import React from "react"
 import { useState } from 'react';
-import Router from 'next/router'
-import cookie from 'js-cookie';
 import { useFormik } from 'formik';
+import { toast } from 'react-toastify';
 import * as yup from "yup"
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { createRequestSuccess, createRequestFailure } from '../../lib/actions/requestActions'
 import utilStyles from '../../styles/utils.module.css'
 
@@ -22,47 +21,50 @@ const validationSchema = yup.object().shape({
 export default function MakeRequest() {
 
   const dispatch =  useDispatch();
-  const [requestError, setRequestError] = useState(null)
+  const { user } = useSelector(state => state.user)
+  const { token } = user
+  
+  const createRequest = async (request) => {
 
-  const createRequest = async (values) => {
-    dispatch(createRequestSuccess(values))
-
-    const request = {
-      request_title: values.title,
-      request_body: values.description
+    const attributes = {
+      request_title: request.title,
+      request_body: request.description,
+      status: 'unresponded',
+      created_at: (new Date).toString(),
+      username: user.username
     }
+
+    dispatch(createRequestSuccess({attributes}))
+
     const resp = await fetch('http://localhost:3000/api/requests', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+         token
       },
       body: JSON.stringify({
-        request: request
+        request: attributes
       })
     })
     const json = await resp.json()
 
-    if (json.status == 201) {
-      //notification
-    } else {
+    if (json.status != 201) {
       dispatch(createRequestFailure(json))
-      //notification
-      setRequestError(json.message)
+      toast.error(json.message)
     }
   }
 
-  const { handleSubmit, handleChange, values, errors } = useFormik({
+  const { resetForm, handleSubmit, handleChange, values, errors } = useFormik({
     initialValues: { title: '', description: '' },
     validationSchema,
-    onSubmit(values){ createRequest(values)}
-
+    onSubmit(values){
+      createRequest(values)
+      resetForm()
+    }
   })
   return (
     <div style={{ textAlign: 'center'}}>
       <h3>Make a request.</h3>
-      <p className={utilStyles.errorMessage}>
-        {requestError && requestError}
-      </p>
       <form onSubmit={handleSubmit} className={utilStyles.requestForm}>
         <input
           className={utilStyles.requestTitle}
@@ -70,7 +72,7 @@ export default function MakeRequest() {
           type="text"
           name="title"
           onChange={handleChange}
-          defaultValue={values.title}
+          value={values.title || ''}
         />
         <span className={utilStyles.inputErrorMessage}> 
          {errors.title && errors.title}
@@ -81,7 +83,7 @@ export default function MakeRequest() {
           type="text"
           name="description"
           onChange={handleChange}
-          defaultValue={values.description}
+          value={values.description || ''}
         />
         <span className={utilStyles.inputErrorMessage}>
           {errors.description && errors.description}

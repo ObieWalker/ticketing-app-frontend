@@ -1,14 +1,15 @@
 import Link from 'next/link'
 import Head from 'next/head'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux'
 import Router from 'next/router'
 import cookie from 'js-cookie';
 import { useFormik } from 'formik';
 import * as yup from "yup"
-import { useDispatch } from 'react-redux'
 import { setUser } from '../../lib/actions/userActions'
 import LoginForm from '../../components/auth/loginForm'
-import Layout from '../../components/layout'
+import Layout from '../../components/layout/layout'
+import { getCookie } from '../../utils/cookieUtil'
 import utilStyles from '../../styles/utils.module.css'
 
 const validationSchema = yup.object().shape({
@@ -27,9 +28,34 @@ const validationSchema = yup.object().shape({
 export default function Login() {
 
   const dispatch =  useDispatch();
+
+  useEffect(() => {
+    const token = getCookie("token")
+    if (token) getUser(token)
+  }, [])
+
+  const getUser = async (token) => {
+
+    const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
+
+    const apiUrl = `${protocol}://${window.location.host}/api/getUser`
+    const response = await fetch(apiUrl, {
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        token: token
+      }
+    });
+    const json =  await response.json()
+    if (json.status == 200) {
+      dispatch(setUser(json))
+      Router.push('/dashboard')
+    }
+  }
+
   const [loginError, setLoginError] = useState(null)
   const handleLogin = async (user) => {
-    const resp = await fetch('http://localhost:3000/api/login', {
+    const resp = await fetch('http://localhost:3000/api/sessions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

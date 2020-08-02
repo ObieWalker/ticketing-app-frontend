@@ -1,3 +1,5 @@
+import { parseISO, format } from 'date-fns'
+
 export const userRoleName = (role) => {
   switch(role) {
     case "0": return 'Admin'
@@ -18,4 +20,10 @@ export const formatDate = (dateString) => {
 
 export const titleize = (val) => {
   if (val) return val[0].toUpperCase() + val.slice(1); 
+}
+
+
+export default function DateComponent({ dateString }) {
+  const date = parseISO(dateString)
+  return <time dateTime={dateString}>{format(date, 'LLLL d, yyyy')}</time>
 }

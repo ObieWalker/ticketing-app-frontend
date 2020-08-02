@@ -22,6 +22,10 @@ export default function ViewRequest() {
   const [isSearching, setIsSearching] = useState(false);
   const [showModal, setShowModal] = useState(false)  
   const [currentRequest, setRequest] = useState(null)
+  const [nextButton, setNextButton] = useState(true)
+  const [previousButton, setPreviousButton] = useState(false)
+  const [totalEntries, setTotalEntries] = useState(null)
+
   const initialChangeValues = {
     status: null,
     agentAssigned: null,
@@ -42,6 +46,17 @@ export default function ViewRequest() {
     getRequests()
   }, [queryValues])
 
+  useEffect(() => {
+    setButtonsState()
+  }, [queryValues.page, totalEntries])
+
+  const setButtonsState = () => {
+    if (queryValues.page > 1) setPreviousButton(true)
+    if (queryValues.page == Math.ceil(totalEntries/5)) setNextButton(false)
+    if (queryValues.page < Math.ceil(totalEntries/5)) setNextButton(true)
+    if (queryValues.page == 1) setPreviousButton(false)
+  }
+
   const getRequests = async (
     search=queryValues.search,
     status=queryValues.status,
@@ -60,7 +75,10 @@ export default function ViewRequest() {
     const json = await resp.json()
 
     setIsSearching(false);
-    if (json.status == 200) dispatch(getRequestsSuccess(json.requests))
+    if (json.status == 200){
+      dispatch(getRequestsSuccess(json.requests))
+      setTotalEntries(json.total)
+    } 
   }
 
   const columnHeaders = () => {
@@ -202,7 +220,7 @@ export default function ViewRequest() {
           <td>{request_body}</td>
           {
           user.role == 2 ?
-            <td>{status}</td>
+            <td>{titleize(status)}</td>
             :
             <td> 
               <select name="status"
@@ -240,12 +258,12 @@ export default function ViewRequest() {
 
   const search = (e) => {
     const { value } = e.target
-    setQueryValues({search: value})
+    setQueryValues({...initialQueryValues, search: value})
   }
 
   const selectStatus = (e) => {
     const { value } = e.target
-    setQueryValues({status: value})
+    setQueryValues({...initialQueryValues, status: value})
   }
 
   const requestsExist = () => {
@@ -254,6 +272,14 @@ export default function ViewRequest() {
       Object.entries(queryValues).toString() ==
       Object.entries(initialQueryValues).toString()
     )
+  }
+
+  const previousPage = () => {
+    setQueryValues({...queryValues, page: queryValues.page - 1})
+  }
+  
+  const nextPage = () => {
+      setQueryValues({...queryValues, page: queryValues.page + 1})
   }
 
   return (
@@ -274,15 +300,26 @@ export default function ViewRequest() {
           <input type="radio" name="status" value="2"/>
           <label htmlFor="other">Closed</label>
         </div>
+        <button
+          title="Export Last 30 days"
+          className={utilStyles.toolTip}>
+            Generate Closed Requests
+        </button>
         {isSearching && <div>Getting Results...</div>}
         {
           allRequests.length ?
+          <>
+          <div className={utilStyles.navigateButtons}>
+            <button onClick={previousPage} disabled={!previousButton} className={utilStyles.round}>&#8249;</button>
+            <button onClick={nextPage} disabled={!nextButton} className={utilStyles.round}>&#8250;</button>
+          </div>
           <table className={utilStyles.requestsTable}>
             {columnHeaders()}
             <tbody>
               {renderTableData()}
             </tbody>
           </table>
+          </>
           : <p className={utilStyles.errorMessage}>No requests.</p>
         }
       </div>

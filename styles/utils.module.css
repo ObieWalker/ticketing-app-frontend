@@ -323,3 +323,43 @@
   display: inline-flex;
   margin: 1rem
 }
+
+.toolTip {
+  position: relative;
+  display: inline-block;
+  padding: 0.2rem;
+  cursor: pointer;
+  color: white;
+  background-color: rgb(19, 99, 121);;
+}
+
+.toolTip:hover {
+  background-color: rgb(8, 63, 78);;
+}
+
+.toolTip:active {
+  color: red;
+  transform: translateY(4px);
+}
+
+.navigateButtons {
+  float: right;
+  text-decoration: none;
+  padding: 16px;
+}
+
+.round {
+  border-radius: 20%;
+  cursor: pointer;
+  margin: 0 1rem;
+  font-size: 1.4rem;
+  width: 40px;
+  border: none;
+  color: #2b2929;
+  background-color: #cfcbcb;
+}
+
+.round:hover {
+  background-color: rgb(185, 183, 183);
+  color: black;
+}

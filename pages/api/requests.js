@@ -27,15 +27,16 @@ export default async (req, res) => {
     }
 
     case 'GET': {
-      const query = `q=${req.query.q}&status=${req.query.status}`
+      const query = `q=${req.query.q}&status=${req.query.status}&page=${req.query.page}`
       const promise = httpClient.get(`/requests?${query}`)
       const { ok, response, error } = await asyncHandler(promise);
 
       if (ok) {
-        const { data } = response.data
+        const { data , meta} = response.data
         res.json({
           requests: data,
-          status: 200
+          status: 200,
+          total: meta.total
         })
       }
       else {

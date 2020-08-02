@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import Date from '../../components/date'
+import DateComponent from '../../utils/formatUtil';
 import Layout from '../../components/layout/layout';
 import { getPostData, getAllPostIds } from '../../lib/landing'
 import utilStyles from '../../styles/utils.module.css'
@@ -13,7 +13,7 @@ export default function Post({ postData }) {
       <article>
         <h1 className={utilStyles.headingXl}> {postData.title}</h1>
       <br />
-      <Date dateString={postData.date} />
+      <DateComponent dateString={postData.date} />
       <br />
       <div dangerouslySetInnerHTML={{ __html: postData.contentHtml }} />
       </article>

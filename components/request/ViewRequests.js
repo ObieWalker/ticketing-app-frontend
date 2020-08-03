@@ -10,6 +10,7 @@ import utilStyles from '../../styles/utils.module.css';
 import { formatDate, titleize } from '../../utils/formatUtil';
 import { getCookie } from '../../utils/cookieUtil';
 import useDebounce from '../../lib/hooks/use-debounce';
+import { statusEnum } from '../../lib/constants/enumConstant'
 
 
 export default function ViewRequest() {
@@ -83,6 +84,23 @@ export default function ViewRequest() {
     } 
   }
 
+  const getComments = async (id) => {
+    const resp = await fetch(`http://localhost:3000/api/comments?requestId=${id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'token': user.token
+      }
+    })
+    const json = await resp.json()
+
+    if (json.status == 200) {
+      dispatch(getCommentsSuccess(json.comments))
+    } else {
+      toast.error(json.message)
+    }
+  }
+
   const columnHeaders = () => {
     return (
       <thead>
@@ -113,23 +131,6 @@ export default function ViewRequest() {
     )
   }
 
-  const getComments = async (id) => {
-    const resp = await fetch(`http://localhost:3000/api/comments?requestId=${id}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'token': user.token
-      }
-    })
-    const json = await resp.json()
-
-    if (json.status == 200) {
-      dispatch(getCommentsSuccess(json.comments))
-    } else {
-      toast.error(json.message)
-    }
-  }
-
   const handleRequestclick = (request) => {
     getComments(request.id)
     displayModal()
@@ -137,20 +138,14 @@ export default function ViewRequest() {
   }
 
   const handleStatus = (currentStatus) => {
-    const statusEnum = ['unresponded', 'opened', 'closed'];
     let currentStatusIndex = statusEnum.indexOf(currentStatus)
-    delete statusEnum[currentStatusIndex]
-    let unselectedStatus = []
-    statusEnum.map((val, i) => Boolean(val) ? unselectedStatus.push({
-      "index": i ,"value": val
-    }) : null )
 
     return (
       <>
         {currentStatus && <option value={currentStatusIndex}>{titleize(currentStatus)}</option>}
-        {unselectedStatus.map((status, i) => 
-          <option key={i} value={status.index}>{titleize(status?.value)}</option>
-        )}
+        {statusEnum.map((status, i) => {
+          if (i != currentStatusIndex) return <option key={i} value={i}>{titleize(status)}</option>
+        })}
       </>
     )
   }

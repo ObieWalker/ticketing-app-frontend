@@ -26,11 +26,11 @@ export default async (req, res) => {
 
     case 'GET': {
       let promise;
-      if (req.headers.export){
-        promise =  httpClient.get('/requests/id')
+      if (req.headers.all){
+        const query = `?q=${req.query.q}&page=${req.query.page}`
+        promise =  httpClient.get(`/users${query}`)
       } else {
-        const query = `q=${req.query.q}&status=${req.query.status}&page=${req.query.page}`
-        promise = httpClient.get(`/requests?${query}`)
+        promise = httpClient.get("/users/id")
       }
 
       const { ok, response, error } = await asyncHandler(promise);
@@ -38,7 +38,7 @@ export default async (req, res) => {
       if (ok) {
         const { data , meta = {}} = response.data || {}
         res.json({
-          requests: data,
+          users: data,
           status: 200,
           total: meta.total || {}
         })

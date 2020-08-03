@@ -10,6 +10,7 @@ import { getCookie } from '../../utils/cookieUtil'
 import { withAuthSync } from '../../utils/auth'
 import MakeRequest from '../../components/request/MakeRequest'
 import ViewRequests from '../../components/request/ViewRequests'
+import Users from '../../components/users/Users'
 import { titleize } from '../../utils/formatUtil'
 import { setUser } from '../../lib/actions/userActions'
 import DashboardLayout from '../../components/layout/DashboardLayout'
@@ -66,6 +67,7 @@ const Dashboard = () => {
         <section style={{ width: '100%' }}>
           <div>
             <h2>{userRoleName(role)} Page.</h2>
+            <Users />
             <MakeRequest />
             <hr />
             <ViewRequests />

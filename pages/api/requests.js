@@ -53,7 +53,7 @@ export default async (req, res) => {
     }
 
     case 'PUT': {
-      const promise = httpClient.put(`/requests/${req.query.id}`)
+      const promise = httpClient.put(`/requests/${req.query.requestId}`, req.body)
       const { ok, response, error } = await asyncHandler(promise);
 
       if (ok) {

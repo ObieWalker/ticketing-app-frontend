@@ -2,11 +2,17 @@ import React from "react"
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify';
+import { confirmAlert } from 'react-confirm-alert';
 import utilStyles from '../../styles/utils.module.css';
-import { formatDate, titleize } from '../../utils/formatUtil';
+import userStyles from '../../styles/users.module.css';
+import { titleize } from '../../utils/formatUtil';
 import { getCookie } from '../../utils/cookieUtil';
 import useDebounce from '../../lib/hooks/use-debounce';
-import { getUsersSuccess, userModified } from '../../lib/actions/usersAction'
+import {
+  getUsersSuccess,
+  userModified,
+  deleteUserSuccess,
+} from '../../lib/actions/usersAction'
 import { roles } from '../../lib/constants/enumConstant';
 
 export default function Users() {
@@ -20,13 +26,12 @@ export default function Users() {
   const [nextButton, setNextButton] = useState(true)
   const [previousButton, setPreviousButton] = useState(false)
   const [totalEntries, setTotalEntries] = useState(null)
-  const [userChanged, setUserChanged] = useState(false)
-
 
   const initialQueryValues = {
     search: "",
     page: 1
   }
+  const [userRole, setUserRole] = useState(null)
   const [queryValues, setQueryValues] = useState(initialQueryValues)
 
   const debouncedSearchTerm = useDebounce(queryValues.search, 500);
@@ -71,6 +76,68 @@ export default function Users() {
     } 
   }
 
+  const handleSave = async (
+    userId,
+    role = userRole
+  ) => {
+    dispatch(userModified())
+    const token = user.token ? user.token : getCookie("token")
+    const resp = await fetch(`http://localhost:3000/api/users?userId=${userId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        token
+      },
+      body: JSON.stringify({
+        role
+      })
+    })
+    const json = await resp.json()
+    if (json.status == 200) {
+      toast.success(json.message)
+    } else {
+      toast.error(json.message)
+    }
+  }
+
+  const handleDelete = (
+    userId,
+  ) => {
+    confirmAlert({
+      title: 'Delete User',
+      message: 'Are you sure to delete this user?',
+      buttons: [
+        {
+          label: 'Yes',
+          onClick: () => handleClickDelete(userId)
+        },
+        {
+          label: 'No',
+          onClick: () => close()
+        }
+      ]
+    });
+  }
+
+  const handleClickDelete = async (id) => {
+    const token = user.token ? user.token : getCookie("token")
+    const resp = await fetch(`http://localhost:3000/api/users?userId=${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        token
+      }
+    })
+    const json = await resp.json()
+    if (json.status == 200) {
+      dispatch(deleteUserSuccess(id))
+      getUsers()
+      toast.success(json.message)
+    } else {
+      toast.error(json.message)
+    }
+  }
+
   const columnHeaders = () => {
     return (
       <thead>
@@ -83,6 +150,9 @@ export default function Users() {
         </th>
         <th>
           Role
+        </th>
+        <th>
+          Action
         </th>
       </tr>
       </thead>
@@ -99,13 +169,10 @@ export default function Users() {
   )
 
   const handleSelect = (event, user) => {
-    const { name } = event.target
     const { value } = event.target
 
+    setUserRole(value)
     dispatch(userModified(user))
-  }
-
-  const handleSave = () => {
   }
 
   const renderTableData = () => {
@@ -118,13 +185,19 @@ export default function Users() {
         <td>{titleize(email)}</td>
         <td> 
           <select name="role"
-          className={utilStyles.statusSelect}
+          className={userStyles.userStatusSelect}
           onChange={(e) => handleSelect(e, user.id)}>
           {handleRole(role, user.id)}
           </select>
         </td>
-          { user.changed &&
-            <td><button onClick={handleSave}>Save</button></td>
+          { user.changed ?
+            <td><button className={userStyles.saveButton}
+              onClick={() => handleSave(user.id)}>Save</button>
+            </td>
+            :
+            <td><button className={userStyles.deleteButton}
+              onClick={() => handleDelete(user.id)}>Delete</button>
+            </td>
           }
         </tr>
       )
@@ -136,14 +209,6 @@ export default function Users() {
     setQueryValues({...initialQueryValues, search: value})
   }
 
-  const usersExist = () => {
-    return !Boolean(
-      allUsers.length < 1 && 
-      Object.entries(queryValues).toString() ==
-      Object.entries(initialQueryValues).toString()
-    )
-  }
-
   const previousPage = () => {
     setQueryValues({...queryValues, page: queryValues.page - 1})
   }
@@ -153,9 +218,7 @@ export default function Users() {
   }
 
   return (
-
-    usersExist() &&
-    <div className={utilStyles.requestsView}>
+    <div className={userStyles.usersView}>
       <div>
         <h3>Users.</h3>
         <form className={utilStyles.searchBox}>
@@ -166,11 +229,15 @@ export default function Users() {
         {
           allUsers.length ?
           <>
-          <div className={utilStyles.navigateButtons}>
-            <button onClick={previousPage} disabled={!previousButton} className={utilStyles.round}>&#8249;</button>
-            <button onClick={nextPage} disabled={!nextButton} className={utilStyles.round}>&#8250;</button>
+          <div className={userStyles.navigateButtons}>
+            <button onClick={previousPage} disabled={!previousButton}
+              className={previousButton ? utilStyles.round: utilStyles.disabledRound}>&#8249;
+            </button>
+            <button onClick={nextPage} disabled={!nextButton}
+              className={nextButton ? utilStyles.round: utilStyles.disabledRound}>&#8250;
+            </button>
           </div>
-          <table className={utilStyles.requestsTable}>
+          <table className={userStyles.usersTable}>
             {columnHeaders()}
             <tbody>
               {renderTableData()}

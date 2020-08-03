@@ -7,6 +7,7 @@ import RequestModal from './RequestModal'
 import { getRequestsSuccess, setRequestToChange } from '../../lib/actions/requestActions';
 import { getCommentsSuccess } from '../../lib/actions/commentActions';
 import utilStyles from '../../styles/utils.module.css';
+import requestsStyles from '../../styles/requests.module.css'
 import { formatDate, titleize } from '../../utils/formatUtil';
 import { getCookie } from '../../utils/cookieUtil';
 import useDebounce from '../../lib/hooks/use-debounce';
@@ -101,6 +102,51 @@ export default function ViewRequest() {
     }
   }
 
+  const generateMonthlyExport = async () => {
+    const token = user.token ? user.token : getCookie("token")
+    const resp = await fetch(`http://localhost:3000/api/requests`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'token': token,
+        'export': true
+      }
+    })
+    const json = await resp.json()
+    if (json.status == 200){
+      dispatch(getRequestsSuccess(json.requests))
+      setExportState(true)
+    }
+  }
+
+  const handleSave = async (
+    requestId = changedValues.request,
+    status = changedValues.status,
+    agent_assigned = changedValues.agentAssigned
+  ) => {
+    dispatch(setRequestToChange())
+    const token = user.token ? user.token : getCookie("token")
+    const resp = await fetch(`http://localhost:3000/api/requests?requestId=${requestId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        token
+      },
+      body: JSON.stringify({
+        request: {
+          status,
+          agent_assigned
+        }
+      })
+    })
+    const json = await resp.json()
+    if (json.status == 200) {
+      toast.success(json.message)
+    } else {
+      toast.error(json.message)
+    }
+  }
+
   const columnHeaders = () => {
     return (
       <thead>
@@ -154,21 +200,21 @@ export default function ViewRequest() {
     if (user.user_id == agentAssigned){
       return (
         <>
-          <option value="" defaultValue disabled hidden>Assign Option</option>
+          <option value="" defaultValue hidden>Assign Option</option>
           <option value="">Unassign</option>
         </>
       )
     } else if (!agentAssigned){
       return (
         <>
-          <option value="" defaultValue disabled hidden>Assign Option</option>
+          <option value="" defaultValue hidden>Assign Option</option>
           <option value={user.user_id}>Self-Assign</option>
         </>
       )
     } else {
       return (
         <>
-          <option value="" defaultValue disabled hidden>Assign Options</option>
+          <option value="" defaultValue hidden>Assign Options</option>
           <option value={user.user_id}>Self-Assign</option>
           <option value="">Unassign</option>
         </>
@@ -192,18 +238,18 @@ export default function ViewRequest() {
       request,
       [name]: value
     }
+
     setChangedValues({...changedValues, ...query})
   }
 
   const handleAssignAgent = (agentAssigned, request) => {
     return (
-      <select name="agentAssigned" onChange={(e) => handleSelect(e, request)} className={utilStyles.statusSelect}>
+      <select name="agentAssigned"
+        onChange={(e) => handleSelect(e, request)}
+        className={requestsStyles.statusSelect}>
         {renderOptions(agentAssigned)}
       </select>
     )
-  }
-
-  const handleSave = () => {
   }
 
   const renderTableData = () => {
@@ -221,7 +267,7 @@ export default function ViewRequest() {
             :
             <td> 
               <select name="status"
-              className={utilStyles.statusSelect}
+              className={requestsStyles.statusSelect}
               onChange={(e) => handleSelect(e, request.id)}>
               {handleStatus(status, request.id)}
               </select>
@@ -237,7 +283,7 @@ export default function ViewRequest() {
           }
           <td><button onClick={() => handleRequestclick(request)}>View/Make Comment</button></td>
           { request.changed &&
-            <td><button onClick={handleSave}>Save</button></td>
+            <td><button onClick={() => handleSave(request.id)}>Save</button></td>
           }
         </tr>
       )
@@ -279,23 +325,6 @@ export default function ViewRequest() {
     setQueryValues({...queryValues, page: queryValues.page + 1})
   }
 
-  const generateMonthlyExport = async () => {
-    const token = user.token ? user.token : getCookie("token")
-    const resp = await fetch(`http://localhost:3000/api/requests`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'token': token,
-        'export': true
-      }
-    })
-    const json = await resp.json()
-    if (json.status == 200){
-      dispatch(getRequestsSuccess(json.requests))
-      setExportState(true)
-    } 
-  }
-
   const clearExportState = () => {
     setExportState(false)
     setQueryValues(initialQueryValues)
@@ -303,13 +332,13 @@ export default function ViewRequest() {
 
   return (
     requestsExist() &&
-    <div className={utilStyles.requestsView}>
+    <div className={requestsStyles.requestsView}>
       <div>
         <h3>Requests.</h3>
         <form className={utilStyles.searchBox}>
           <input type="text" onChange={(e) => search(e)} placeholder="Search by Subject..." name="search"/>
         </form>
-        <div name="status" onChange={(e) => selectStatus(e)} className={utilStyles.radioButtons}>
+        <div name="status" onChange={(e) => selectStatus(e)} className={requestsStyles.radioButtons}>
           <input type="radio" name="status" value="" defaultChecked />
           <label htmlFor="all">All</label><br/>
           <input type="radio" name="status" value="0"/>
@@ -322,7 +351,7 @@ export default function ViewRequest() {
         <button
           onClick={generateMonthlyExport}
           title="Last 30 days"
-          className={utilStyles.toolTip}>
+          className={requestsStyles.toolTip}>
             Generate Closed Requests
         </button>
         { exportState &&
@@ -342,10 +371,14 @@ export default function ViewRequest() {
           allRequests.length ?
           <>
           <div className={utilStyles.navigateButtons}>
-            <button onClick={previousPage} disabled={!previousButton} className={utilStyles.round}>&#8249;</button>
-            <button onClick={nextPage} disabled={!nextButton} className={utilStyles.round}>&#8250;</button>
+            <button onClick={previousPage} disabled={!previousButton}
+              className={previousButton ? utilStyles.round: utilStyles.disabledRound}>&#8249;
+            </button>
+            <button onClick={nextPage} disabled={!nextButton}
+              className={nextButton ? utilStyles.round: utilStyles.disabledRound}>&#8250;
+            </button>
           </div>
-          <table id="exportable" className={utilStyles.requestsTable}>
+          <table id="exportable" className={requestsStyles.requestsTable}>
             {columnHeaders()}
             <tbody>
               {renderTableData()}

@@ -53,7 +53,7 @@ export default async (req, res) => {
     }
 
     case 'PUT': {
-      const promise = httpClient.put(`/requests/${req.query.id}`)
+      const promise = httpClient.put(`/users/${req.query.userId}`, req.body)
       const { ok, response, error } = await asyncHandler(promise);
 
       if (ok) {
@@ -71,6 +71,27 @@ export default async (req, res) => {
       }
       break
     }
+
+    case 'DELETE': {
+      const promise = httpClient.delete(`/users/${req.query.userId}`, req.body)
+      const { ok, response, error } = await asyncHandler(promise);
+
+      if (ok) {
+        const { message } = response.data
+        res.json({
+          message,
+          status: 200
+        })
+      }
+      else {
+        res.json({
+          message: error.response.data.message,
+          status: error.response.status
+        })
+      }
+      break
+    }
+
     default:
       res.status(405).end() //Method Not Allowed
       break

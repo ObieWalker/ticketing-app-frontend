@@ -1,0 +1,88 @@
+
+.modalMain {
+  position:fixed;
+  background: white;
+  width: 80%;
+  max-width: 800px;
+  height: 60%;
+  min-height: 300px;
+  top:50%;
+  left:50%;
+  transform: translate(-50%,-50%);
+  padding: 1rem;
+  overflow: auto;
+}
+
+.commentBox{
+  font-size: 1rem;
+  padding: 1rem;
+  line-height: 2;
+  margin: 3rem 0 0 6.6rem !important;
+  width: 56% !important;
+  bottom:0;
+  resize: none
+}
+
+.commentsBox {
+  border: 1px solid rgb(20, 27, 29);
+  border-radius: 10px;
+  height: 200px;
+  width: 56%;
+  overflow: auto;
+  position: relative;
+  margin: auto;
+  padding: 1rem;
+}
+
+.modalButton, .disabledModalButton{
+  margin: 4rem 2rem 1rem 0.5rem;
+  float: right;
+  bottom:0;
+  right: 0;
+  font-size: 1.2rem;
+  line-height: 1.5;
+  border-radius: 9px;
+  padding: 10px 15px;
+  background-color: rgb(70, 153, 179);
+  color: white;
+  border: 1px solid rgb(70, 153, 179);
+  transition: ease-in-out background-color 250ms, ease-in-out color 250ms;
+}
+
+.disabledModalButton {
+  border: 1px solid #999999;
+  background-color: #cccccc;
+  color: #666666;
+}
+
+.modalButton:hover {
+  cursor: pointer;
+  background-color: rgb(25, 81, 99);
+  color: rgb(157, 165, 187);
+}
+
+.modalCustomerName {
+  float: left;
+}
+
+.closeModal {
+  float: right;
+  margin: 0.1rem;
+  background-color: rgb(70, 153, 179);
+  border-radius: 5px;
+  color: white;
+}
+
+.closeModal:hover {
+  cursor: pointer;
+  background-color: rgb(25, 81, 99);
+  color: rgb(157, 165, 187);
+}
+
+.modalRequest {
+  display: block;
+	font-size: 16px;
+	font-family: sans-serif;
+  font-weight: 700;
+  margin: 1rem 1rem 1rem 1rem;
+}

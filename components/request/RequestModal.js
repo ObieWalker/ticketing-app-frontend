@@ -6,6 +6,7 @@ import { createCommentSuccess, createCommentFailure } from '../../lib/actions/co
 import { updateRequestStatus } from '../../lib/actions/requestActions';
 import {formatDate, titleize} from '../../utils/formatUtil';
 import utilStyles from '../../styles/utils.module.css'
+import modalStyles from '../../styles/modal.module.css'
 
 export default function RequestModal({ handleClose, show, children, comments, user }) {
 
@@ -58,16 +59,16 @@ export default function RequestModal({ handleClose, show, children, comments, us
 
   return (
     <div className={show ? utilStyles.showClass : utilStyles.hideClass}>
-      <section className={utilStyles.modalMain}>
-      <span className={utilStyles.modalCustomerName}>Customer Name: {titleize(username)}</span>
-        <button className={utilStyles.closeModal} onClick={handleClose}>X</button>
+      <section className={modalStyles.modalMain}>
+      <span className={modalStyles.modalCustomerName}>Customer Name: {titleize(username)}</span>
+        <button className={modalStyles.closeModal} onClick={handleClose}>X</button>
         <span>{formatDate(created_at)}</span>
         <hr />
         <h2>{request_title}</h2>
-        <div className={utilStyles.modalRequest}>{request_body}</div>
+        <div className={modalStyles.modalRequest}>{request_body}</div>
           { comments && comments.length > 0 &&
           
-            <div className={utilStyles.commentsBox}>
+            <div className={modalStyles.commentsBox}>
               {
                 comments.map((comment, i) => (
                   <React.Fragment key={i}>
@@ -80,10 +81,10 @@ export default function RequestModal({ handleClose, show, children, comments, us
             </div>
           }
         { renderCommentBox(user.role, comments.length) &&
-          <form onSubmit={handleSubmit} className={utilStyles}>
+          <form onSubmit={handleSubmit}>
 
           <textarea
-            className={utilStyles.commentBox}
+            className={modalStyles.commentBox}
             placeholder="Comment"
             type="text"
             name="comment"
@@ -95,7 +96,7 @@ export default function RequestModal({ handleClose, show, children, comments, us
           </span>
   
             <button disabled={!values.comment} 
-            className={values.comment ? utilStyles.modalButton : utilStyles.disabledModalButton}
+            className={values.comment ? modalStyles.modalButton : modalStyles.disabledModalButton}
             >Post</button>
           </form>
         }

@@ -1,8 +1,7 @@
 import axios from 'axios';
 
 const config = {
-  baseURL:`${process.env.API_URL}`,
-
+  baseURL:`${process.env.BACKEND_SERVER_URL}`
 };
 const axiosClient = axios.create(config);
 

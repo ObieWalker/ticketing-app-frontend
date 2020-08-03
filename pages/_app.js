@@ -4,6 +4,7 @@ import { createWrapper } from 'next-redux-wrapper'
 import App from 'next/app';
 import {toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'
+import 'react-confirm-alert/src/react-confirm-alert.css';
 import store from '../lib/store';
 
 toast.configure()

@@ -1,11 +1,11 @@
 import React from "react"
-import { useState } from 'react';
 import { useFormik } from 'formik';
 import { toast } from 'react-toastify';
 import * as yup from "yup"
 import { useDispatch, useSelector } from 'react-redux'
 import { createRequestSuccess, createRequestFailure } from '../../lib/actions/requestActions'
 import utilStyles from '../../styles/utils.module.css'
+import requestsStyles from '../../styles/requests.module.css'
 
 const validationSchema = yup.object().shape({
   title: yup
@@ -65,9 +65,9 @@ export default function MakeRequest() {
   return (
     <div style={{ textAlign: 'center'}}>
       <h3>Make a request.</h3>
-      <form onSubmit={handleSubmit} className={utilStyles.requestForm}>
+      <form onSubmit={handleSubmit} className={requestsStyles.requestForm}>
         <input
-          className={utilStyles.requestTitle}
+          className={requestsStyles.requestTitle}
           placeholder="Title"
           type="text"
           name="title"
@@ -78,7 +78,7 @@ export default function MakeRequest() {
          {errors.title && errors.title}
         </span>
         <textarea
-          className={utilStyles.requestInput}
+          className={requestsStyles.requestInput}
           placeholder="Request Details"
           type="text"
           name="description"
@@ -89,7 +89,7 @@ export default function MakeRequest() {
           {errors.description && errors.description}
         </span>
 
-        <button className={utilStyles.formButton} type="submit">Submit Request</button>
+        <button className={requestsStyles.formButton} type="submit">Submit Request</button>
       </form>
     </div>
   )

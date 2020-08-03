@@ -4,9 +4,9 @@ import httpClient from '../../helpers/httpClient'
 import {asyncHandler} from '../../helpers/customMethods'
 
 export default async (req, res) => {
+  httpClient.setAuthorizationToken(req.headers.token)
   switch(req.method) {
     case 'POST': {
-      httpClient.setAuthorizationToken({})
       const postPromise = httpClient.post("/comments", req.body)
       const { ok, response, error } = await asyncHandler(postPromise);
       if (ok) {
@@ -28,7 +28,6 @@ export default async (req, res) => {
 
     case 'GET': {
       const query = `request_id=${req.query.requestId}`
-      httpClient.setAuthorizationToken(req.headers.token)
       const getPromise = httpClient.get(`/comments?${query}`)
       const { ok, response, error } = await asyncHandler(getPromise);
 
@@ -48,6 +47,8 @@ export default async (req, res) => {
       }
       break
     }
-
+    default:
+      res.status(405).end() //Method Not Allowed
+      break
   }
 }

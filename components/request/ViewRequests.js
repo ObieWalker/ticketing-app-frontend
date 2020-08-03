@@ -1,6 +1,7 @@
 import React from "react"
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
+import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 import { toast } from 'react-toastify';
 import RequestModal from './RequestModal'
 import { getRequestsSuccess, setRequestToChange } from '../../lib/actions/requestActions';
@@ -25,7 +26,8 @@ export default function ViewRequest() {
   const [nextButton, setNextButton] = useState(true)
   const [previousButton, setPreviousButton] = useState(false)
   const [totalEntries, setTotalEntries] = useState(null)
-
+  const [exportState, setExportState] = useState(false)
+  
   const initialChangeValues = {
     status: null,
     agentAssigned: null,
@@ -279,7 +281,29 @@ export default function ViewRequest() {
   }
   
   const nextPage = () => {
-      setQueryValues({...queryValues, page: queryValues.page + 1})
+    setQueryValues({...queryValues, page: queryValues.page + 1})
+  }
+
+  const generateMonthlyExport = async () => {
+    const token = user.token ? user.token : getCookie("token")
+    const resp = await fetch(`http://localhost:3000/api/requests`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'token': token,
+        'export': true
+      }
+    })
+    const json = await resp.json()
+    if (json.status == 200){
+      dispatch(getRequestsSuccess(json.requests))
+      setExportState(true)
+    } 
+  }
+
+  const clearExportState = () => {
+    setExportState(false)
+    setQueryValues(initialQueryValues)
   }
 
   return (
@@ -301,10 +325,23 @@ export default function ViewRequest() {
           <label htmlFor="other">Closed</label>
         </div>
         <button
-          title="Export Last 30 days"
+          onClick={generateMonthlyExport}
+          title="Last 30 days"
           className={utilStyles.toolTip}>
             Generate Closed Requests
         </button>
+        { exportState &&
+        <div onClick={clearExportState}>
+          <ReactHTMLTableToExcel
+            id="test-table-xls-button"
+            className="download-table-xls-button"
+            table="exportable"
+            filename="tablexls"
+            sheet="tablexls"
+            buttonText="Download export as XLS"
+          />
+          </div>
+        }
         {isSearching && <div>Getting Results...</div>}
         {
           allRequests.length ?
@@ -313,7 +350,7 @@ export default function ViewRequest() {
             <button onClick={previousPage} disabled={!previousButton} className={utilStyles.round}>&#8249;</button>
             <button onClick={nextPage} disabled={!nextButton} className={utilStyles.round}>&#8250;</button>
           </div>
-          <table className={utilStyles.requestsTable}>
+          <table id="exportable" className={utilStyles.requestsTable}>
             {columnHeaders()}
             <tbody>
               {renderTableData()}

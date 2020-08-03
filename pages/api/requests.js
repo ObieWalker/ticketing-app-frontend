@@ -27,16 +27,22 @@ export default async (req, res) => {
     }
 
     case 'GET': {
-      const query = `q=${req.query.q}&status=${req.query.status}&page=${req.query.page}`
-      const promise = httpClient.get(`/requests?${query}`)
+      let promise;
+      if (req.headers.export){
+        promise =  httpClient.get('/requests/id')
+      } else {
+        const query = `q=${req.query.q}&status=${req.query.status}&page=${req.query.page}`
+        promise = httpClient.get(`/requests?${query}`)
+      }
+
       const { ok, response, error } = await asyncHandler(promise);
 
       if (ok) {
-        const { data , meta} = response.data
+        const { data , meta = {}} = response.data || {}
         res.json({
           requests: data,
           status: 200,
-          total: meta.total
+          total: meta.total || {}
         })
       }
       else {
@@ -67,5 +73,8 @@ export default async (req, res) => {
       }
       break
     }
+    default:
+      res.status(405).end() //Method Not Allowed
+      break
   }
 }

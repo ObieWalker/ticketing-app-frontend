@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux'
 import { useFormik } from 'formik';
 import {toast} from 'react-toastify';
 import { createCommentSuccess, createCommentFailure } from '../../lib/actions/commentActions'
+import { updateRequestStatus } from '../../lib/actions/requestActions';
 import {formatDate, titleize} from '../../utils/formatUtil';
 import utilStyles from '../../styles/utils.module.css'
 
@@ -20,6 +21,7 @@ export default function RequestModal({ handleClose, show, children, comments, us
   const submitComment = async (post) => {
     post.user_id = user.user_id
     dispatch(createCommentSuccess(post))
+    dispatch(updateRequestStatus(children.id))
 
     const resp = await fetch('http://localhost:3000/api/comments', {
       method: 'POST',

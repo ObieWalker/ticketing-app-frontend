@@ -1,12 +1,12 @@
 import React from 'react'
-
+import Layout from '../layout/layout';
 
 const FallbackUI = () => {
   return (
-    <div>
+    <Layout>
       <h1>An unexpected error occured</h1>
       <p>Kindly refresh your browser. If error persists please try again later.</p>
-    </div>
+    </Layout> 
   )
 }
 

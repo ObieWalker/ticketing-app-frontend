@@ -1,10 +1,9 @@
 import React from 'react';
 import Head from 'next/head';
 import { useEffect } from 'react';
-import nextCookie from "next-cookies";
 import { connect, useDispatch, useSelector } from 'react-redux'
 import Router from 'next/router'
-import Error from 'next/error';
+import Loader from 'react-loader-spinner'
 import { userRoleName } from '../../utils/formatUtil';
 import { getCookie } from '../../utils/cookieUtil'
 import { withAuthSync } from '../../utils/auth'
@@ -14,6 +13,7 @@ import Users from '../../components/users/Users'
 import { titleize } from '../../utils/formatUtil'
 import { setUser } from '../../lib/actions/userActions'
 import DashboardLayout from '../../components/layout/DashboardLayout'
+import utilStyles from '../../styles/utils.module.css'
 
 const Dashboard = () => {
 
@@ -63,7 +63,7 @@ const Dashboard = () => {
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <section style={{ width: '100%' }}>
           <div>
-            <h2>{userRoleName(role)} Page.</h2>
+            <h2>{role && `${userRoleName(role)} Dashboard.`}</h2>
             {(() => {
               switch (role) {
                 case "0": return (
@@ -86,11 +86,14 @@ const Dashboard = () => {
                   </>
                 );
                 default: return (
-                  <>
-                    <MakeRequest />
-                    <hr />
-                    <ViewRequests />
-                  </>
+                  <span className={utilStyles.tableLoader}>
+                  <Loader
+                    type="Grid"
+                    color="#4699B3"
+                    height={200}
+                    width={300}
+                  />
+                </span>
                 );
               }
             })()}

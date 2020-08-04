@@ -179,3 +179,7 @@
   background-color: rgb(38, 88, 104);
   cursor: pointer;
 }
+
+.tableLoader {
+  text-align: center;
+}

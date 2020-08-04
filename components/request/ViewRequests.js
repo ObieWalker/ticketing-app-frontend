@@ -281,9 +281,12 @@ export default function ViewRequest() {
               <td>{handleAssignAgent(agent_assigned, request.id)}</td>
             </>
           }
-          <td><button onClick={() => handleRequestclick(request)}>View/Make Comment</button></td>
+          <td><button className={utilStyles.makeComment}
+            onClick={() => handleRequestclick(request)}>View/Make Comment</button></td>
           { request.changed &&
-            <td><button onClick={() => handleSave(request.id)}>Save</button></td>
+            <td><button className={utilStyles.saveButton}
+              onClick={() => handleSave(request.id)}>Save</button>
+            </td>
           }
         </tr>
       )

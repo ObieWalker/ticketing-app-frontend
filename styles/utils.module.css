@@ -124,3 +124,58 @@
   background-color: rgb(185, 183, 183);
   cursor: default;
 }
+
+.formInput {
+  font-size: 1rem;
+  padding: 1rem 6rem 1rem 1rem;
+  line-height: 1;
+  display: block;
+  font-weight: 10;
+  letter-spacing: 0.01rem;
+  margin: 3.1rem 2rem 0 0.1rem;
+  border-radius: 5px;
+}
+
+.formButton {
+  margin-top: 2rem;
+  display: block;
+  font-size: 1.2rem;
+  line-height: 1.5;
+  border-radius: 9px;
+  padding: 10px 15px;
+  background-color: rgb(70, 153, 179);
+  color: white;
+  border: 1px solid rgb(70, 153, 179);
+  transition: ease-in-out background-color 250ms, ease-in-out color 250ms;
+}
+
+.formButton:hover {
+  cursor: pointer;
+  background-color: rgb(25, 81, 99);
+  color: rgb(157, 165, 187);
+}
+
+.form {
+  text-align: center;
+  display: inline-block;
+  margin-left: 120px;
+}
+
+
+.saveButton, .makeComment {
+  bottom:0;
+  right: 0;
+  font-size: 0.7rem;
+  line-height: 1.5;
+  border-radius: 9px;
+  padding: 10px 15px;
+  background-color: rgb(70, 153, 179);
+  color: white;
+  border: 1px solid rgb(70, 153, 179);
+  transition: ease-in-out background-color 250ms, ease-in-out color 250ms;
+}
+
+.saveButton:hover, .makeComment:hover {
+  background-color: rgb(38, 88, 104);
+  cursor: pointer;
+}

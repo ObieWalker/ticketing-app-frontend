@@ -40,7 +40,7 @@ export default function Register() {
   const dispatch =  useDispatch();
   const [registerError, setRegisterError] = useState(null)
   const handleRegister = async (user) => {
-    const resp = await fetch('http://localhost:3000/api/register', {
+    const resp = await fetch('http://localhost:3000/api/users', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

@@ -5,17 +5,25 @@ export default async (req, res) => {
   httpClient.setAuthorizationToken(req.headers.token)
   switch(req.method) {
     case 'POST':{
-      const promise = httpClient.post("/requests", req.body)
+      const promise = httpClient.post("/users", req.body)
       const { ok, response, error } = await asyncHandler(promise);
+
       if (ok) {
-        const { data } = response
+        const { attributes } = response.data.data
+        res.setHeader('Set-Cookie', serialize('token', attributes.token, {
+          // httpOnly: true,
+          secure: process.env.NODE_ENV !== 'development',
+          sameSite: 'none',
+          maxAge: 86400,
+          path: '/'
+        }))
     
+        httpClient.setAuthorizationToken(attributes.token)
         res.json({
-          request: data,
+          user: attributes,
           status: 201
         })
-      }
-      else {
+      } else {
         res.json({
           message: error.response.data.message,
           status: error.response.status
@@ -26,7 +34,8 @@ export default async (req, res) => {
 
     case 'GET': {
       let promise;
-      if (req.headers.all){
+      const { all } = req.headers
+      if (all){
         const query = `?q=${req.query.q}&page=${req.query.page}`
         promise =  httpClient.get(`/users${query}`)
       } else {
@@ -37,13 +46,14 @@ export default async (req, res) => {
 
       if (ok) {
         const { data , meta = {}} = response.data || {}
-        res.json({
-          users: data,
+        const returnObj = {
+          users: (all ? data : undefined),
+          user: (!all ? data.attributes : undefined),
           status: 200,
-          total: meta.total || {}
-        })
-      }
-      else {
+          total: (all ? meta.total || {} : undefined)
+        }
+        res.json(returnObj)
+      } else {
         res.json({
           message: error.response.data.message,
           status: error.response.status
@@ -62,8 +72,7 @@ export default async (req, res) => {
           message,
           status: 200
         })
-      }
-      else {
+      } else {
         res.json({
           message: error.response.data.message,
           status: error.response.status
@@ -82,8 +91,7 @@ export default async (req, res) => {
           message,
           status: 200
         })
-      }
-      else {
+      } else {
         res.json({
           message: error.response.data.message,
           status: error.response.status

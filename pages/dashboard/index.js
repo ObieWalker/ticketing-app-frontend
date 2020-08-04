@@ -15,7 +15,6 @@ import { titleize } from '../../utils/formatUtil'
 import { setUser } from '../../lib/actions/userActions'
 import DashboardLayout from '../../components/layout/DashboardLayout'
 
-
 const Dashboard = () => {
 
   const dispatch =  useDispatch();
@@ -30,9 +29,7 @@ const Dashboard = () => {
 
   const getUser = async (token) => {
 
-    const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
-
-    const apiUrl = `${protocol}://${window.location.host}/api/getUser`
+    const apiUrl = `${process.env.API_SERVER}api/users`
     try {
       const response = await fetch(apiUrl, {
         credentials: "include",
@@ -67,10 +64,36 @@ const Dashboard = () => {
         <section style={{ width: '100%' }}>
           <div>
             <h2>{userRoleName(role)} Page.</h2>
-            <Users />
-            <MakeRequest />
-            <hr />
-            <ViewRequests />
+            {(() => {
+              switch (role) {
+                case "0": return (
+                  <>
+                    <Users />
+                    <hr />
+                    <ViewRequests />
+                  </>
+                );
+                case "1": return (
+                  <>
+                    <ViewRequests />
+                  </>
+                );;
+                case "2": return (
+                  <>
+                    <MakeRequest />
+                    <hr />
+                    <ViewRequests />
+                  </>
+                );
+                default: return (
+                  <>
+                    <MakeRequest />
+                    <hr />
+                    <ViewRequests />
+                  </>
+                );
+              }
+            })()}
           </div>
         </section>
       </div>

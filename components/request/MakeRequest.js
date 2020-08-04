@@ -89,7 +89,7 @@ export default function MakeRequest() {
           {errors.description && errors.description}
         </span>
 
-        <button className={requestsStyles.formButton} type="submit">Submit Request</button>
+        <button className={utilStyles.formButton} type="submit">Submit Request</button>
       </form>
     </div>
   )

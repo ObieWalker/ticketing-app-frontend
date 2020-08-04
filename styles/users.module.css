@@ -3,6 +3,7 @@
   text-align: center;
   overflow: auto;
   max-width: 600px;
+  margin-bottom: 5%;
 }
 
 .usersTable {

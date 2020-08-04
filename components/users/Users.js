@@ -59,7 +59,7 @@ export default function Users() {
     let searchValue = search ? debouncedSearchTerm : ''
     const token = user.token ? user.token : getCookie("token")
     const query = `q=${searchValue}&page=${page}`
-    const resp = await fetch(`http://localhost:3000/api/users?${query}`, {
+    const resp = await fetch(`${process.env.API_SERVER}api/users?${query}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -82,7 +82,7 @@ export default function Users() {
   ) => {
     dispatch(userModified())
     const token = user.token ? user.token : getCookie("token")
-    const resp = await fetch(`http://localhost:3000/api/users?userId=${userId}`, {
+    const resp = await fetch(`${process.env.API_SERVER}api/users?userId=${userId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -121,7 +121,7 @@ export default function Users() {
 
   const handleClickDelete = async (id) => {
     const token = user.token ? user.token : getCookie("token")
-    const resp = await fetch(`http://localhost:3000/api/users?userId=${id}`, {
+    const resp = await fetch(`${process.env.API_SERVER}api/users?userId=${id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -191,7 +191,7 @@ export default function Users() {
           </select>
         </td>
           { user.changed ?
-            <td><button className={userStyles.saveButton}
+            <td><button className={utilStyles.saveButton}
               onClick={() => handleSave(user.id)}>Save</button>
             </td>
             :

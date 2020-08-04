@@ -36,9 +36,7 @@ export default function Login() {
 
   const getUser = async (token) => {
 
-    const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
-
-    const apiUrl = `${protocol}://${window.location.host}/api/getUser`
+    const apiUrl = `${process.env.API_SERVER}api/users`
     const response = await fetch(apiUrl, {
       credentials: "include",
       headers: {

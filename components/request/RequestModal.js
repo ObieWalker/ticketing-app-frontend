@@ -50,6 +50,7 @@ export default function RequestModal({ handleClose, show, children, comments, us
     onSubmit(values){ 
       submitComment(values)
       resetForm()
+      handleClose()
     }
   })
 
@@ -61,7 +62,7 @@ export default function RequestModal({ handleClose, show, children, comments, us
     <div className={show ? utilStyles.showClass : utilStyles.hideClass}>
       <section className={modalStyles.modalMain}>
       <span className={modalStyles.modalCustomerName}>Customer Name: {titleize(username)}</span>
-        <button className={modalStyles.closeModal} onClick={handleClose}>X</button>
+        <button className={modalStyles.closeModal} onClick={() => {handleClose(); resetForm();}}>X</button>
         <span>{formatDate(created_at)}</span>
         <hr />
         <h2>{request_title}</h2>

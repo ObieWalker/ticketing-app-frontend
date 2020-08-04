@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify';
 import { confirmAlert } from 'react-confirm-alert';
+import Loader from 'react-loader-spinner'
 import utilStyles from '../../styles/utils.module.css';
 import userStyles from '../../styles/users.module.css';
 import { titleize } from '../../utils/formatUtil';
@@ -14,6 +15,8 @@ import {
   deleteUserSuccess,
 } from '../../lib/actions/usersAction'
 import { roles } from '../../lib/constants/enumConstant';
+import NavigateButtons from '../buttons/NavigateButtons';
+import {usersColumnHeaders} from '../tables/TableColumns';
 
 export default function Users() {
 
@@ -138,27 +141,6 @@ export default function Users() {
     }
   }
 
-  const columnHeaders = () => {
-    return (
-      <thead>
-      <tr>
-        <th>
-          Username
-        </th>
-        <th>
-          Email
-        </th>
-        <th>
-          Role
-        </th>
-        <th>
-          Action
-        </th>
-      </tr>
-      </thead>
-    )
-  }
-
   const handleRole = (userRole) => (
     <>
       {<option value={userRole}>{roles[userRole]}</option>}
@@ -218,35 +200,52 @@ export default function Users() {
   }
 
   return (
-    <div className={userStyles.usersView}>
-      <div>
-        <h3>Users.</h3>
-        <form className={utilStyles.searchBox}>
-          <input type="text" onChange={(e) => search(e)} placeholder="Search by Username or Email..." name="search"/>
-        </form>
+    isSearching && !queryValues.search ?
+      <span className={utilStyles.tableLoader}>
+        <Loader
+          type="Rings"
+          color="#4699B3"
+          height={200}
+          width={300}
+        />
+      </span>
+      :
+      <div className={userStyles.usersView}>
+        <div>
+          <h3>Users.</h3>
+          <form className={utilStyles.searchBox}>
+            <input type="text" onChange={(e) => search(e)}
+              placeholder="Search by Username or Email..." name="search"
+            />
+          </form>
 
-        {isSearching && <div>Getting Results...</div>}
-        {
-          allUsers.length ?
-          <>
-          <div className={userStyles.navigateButtons}>
-            <button onClick={previousPage} disabled={!previousButton}
-              className={previousButton ? utilStyles.round: utilStyles.disabledRound}>&#8249;
-            </button>
-            <button onClick={nextPage} disabled={!nextButton}
-              className={nextButton ? utilStyles.round: utilStyles.disabledRound}>&#8250;
-            </button>
-          </div>
-          <table className={userStyles.usersTable}>
-            {columnHeaders()}
-            <tbody>
-              {renderTableData()}
-            </tbody>
-          </table>
-          </>
-          : <p className={utilStyles.errorMessage}>No Users.</p>
-        }
+          {isSearching &&
+            <Loader
+              type="ThreeDots"
+              color="#4699B3"
+              height={50}
+              width={50}
+            />
+          }
+          {
+            allUsers.length ?
+            <>
+              <NavigateButtons
+                previousPage={previousPage}
+                nextPage={nextPage}
+                previousButton={previousButton}
+                nextButton={nextButton}
+              />
+            <table className={userStyles.usersTable}>
+              {usersColumnHeaders()}
+              <tbody>
+                {renderTableData()}
+              </tbody>
+            </table>
+            </>
+            : <p className={utilStyles.errorMessage}>No Users.</p>
+          }
+        </div>
       </div>
-    </div>
   )
 }

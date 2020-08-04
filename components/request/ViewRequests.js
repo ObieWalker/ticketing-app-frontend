@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
 import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 import { toast } from 'react-toastify';
+import Loader from 'react-loader-spinner'
 import RequestModal from './RequestModal'
 import { getRequestsSuccess, setRequestToChange } from '../../lib/actions/requestActions';
 import { getCommentsSuccess } from '../../lib/actions/commentActions';
@@ -12,7 +13,10 @@ import { formatDate, titleize } from '../../utils/formatUtil';
 import { getCookie } from '../../utils/cookieUtil';
 import useDebounce from '../../lib/hooks/use-debounce';
 import { statusEnum } from '../../lib/constants/enumConstant'
-
+import RadioButtons from './RequestRadioButtons';
+import NavigateButtons from '../buttons/NavigateButtons';
+import MonthlyExport from '../buttons/MonthlyExportButton';
+import {requestColumnHeaders} from '../tables/TableColumns';
 
 export default function ViewRequest() {
 
@@ -145,36 +149,6 @@ export default function ViewRequest() {
     } else {
       toast.error(json.message)
     }
-  }
-
-  const columnHeaders = () => {
-    return (
-      <thead>
-      <tr>
-        <th>
-          Subject
-        </th>
-        <th>
-          Request
-        </th>
-        <th>
-          Status
-        </th>
-        <th>
-          Agent Assigned
-        </th>
-        <th>
-          Date
-        </th>
-        {user.role != 2 && 
-          <>
-            <th>Customer Name</th>
-            <th>Handle Assignment</th>
-          </>
-        }
-      </tr>
-      </thead>
-    )
   }
 
   const handleRequestclick = (request) => {
@@ -314,6 +288,7 @@ export default function ViewRequest() {
 
   const requestsExist = () => {
     return !Boolean(
+      user.role == 2 &&
       allRequests.length < 1 && 
       Object.entries(queryValues).toString() ==
       Object.entries(initialQueryValues).toString()
@@ -334,71 +309,77 @@ export default function ViewRequest() {
   }
 
   return (
-    requestsExist() &&
-    <div className={requestsStyles.requestsView}>
-      <div>
-        <h3>Requests.</h3>
-        <form className={utilStyles.searchBox}>
-          <input type="text" onChange={(e) => search(e)} placeholder="Search by Subject..." name="search"/>
-        </form>
-        <div name="status" onChange={(e) => selectStatus(e)} className={requestsStyles.radioButtons}>
-          <input type="radio" name="status" value="" defaultChecked />
-          <label htmlFor="all">All</label><br/>
-          <input type="radio" name="status" value="0"/>
-          <label htmlFor="unresponded">Unresponded</label><br/>
-          <input type="radio" name="status" value="1"/>
-          <label htmlFor="female">Opened</label><br/>
-          <input type="radio" name="status" value="2"/>
-          <label htmlFor="other">Closed</label>
+    isSearching && !queryValues.search ?
+      <span className={utilStyles.tableLoader}>
+        <Loader
+          type="Rings"
+          color="#4699B3"
+          height={200}
+          width={300}
+        />
+      </span>
+      :
+      requestsExist() &&
+        <div className={requestsStyles.requestsView}>
+          <div>
+            <h2>Requests.</h2>
+            <form className={utilStyles.searchBox}>
+              <input type="text" onChange={(e) => search(e)} placeholder="Search by Subject..." name="search"/>
+            </form>
+            {
+              isSearching &&
+                <Loader
+                  type="ThreeDots"
+                  color="#4699B3"
+                  height={50}
+                  width={50}
+                />
+            }
+            <RadioButtons />
+            <MonthlyExport
+              role={user.role}
+              generateMonthlyExport={generateMonthlyExport}
+            />
+            { exportState &&
+              <div onClick={clearExportState}>
+                <ReactHTMLTableToExcel
+                  id="test-table-xls-button"
+                  className="download-table-xls-button"
+                  table="exportable"
+                  filename="tablexls"
+                  sheet="tablexls"
+                  buttonText="Download export as XLS"
+                />
+              </div>
+            }
+            {allRequests.length ?
+              <>
+                <NavigateButtons
+                  previousPage={previousPage}
+                  previousButton={previousButton}
+                  nextPage={nextPage}
+                  nextButton={nextButton}/>
+                <table id="exportable" className={requestsStyles.requestsTable}>
+                  {requestColumnHeaders(user)}
+                  <tbody>
+                    {renderTableData()}
+                  </tbody>
+                </table>
+              </>
+              :
+              <p className={utilStyles.errorMessage}>
+                No requests.
+              </p>
+            }
+          </div>
+          <RequestModal
+            show={showModal}
+            handleClose={hideModal}
+            user={user}
+            comments={comments || {}}
+          >
+            {currentRequest}
+          </RequestModal>
         </div>
-        <button
-          onClick={generateMonthlyExport}
-          title="Last 30 days"
-          className={requestsStyles.toolTip}>
-            Generate Closed Requests
-        </button>
-        { exportState &&
-        <div onClick={clearExportState}>
-          <ReactHTMLTableToExcel
-            id="test-table-xls-button"
-            className="download-table-xls-button"
-            table="exportable"
-            filename="tablexls"
-            sheet="tablexls"
-            buttonText="Download export as XLS"
-          />
-          </div>
-        }
-        {isSearching && <div>Getting Results...</div>}
-        {
-          allRequests.length ?
-          <>
-          <div className={utilStyles.navigateButtons}>
-            <button onClick={previousPage} disabled={!previousButton}
-              className={previousButton ? utilStyles.round: utilStyles.disabledRound}>&#8249;
-            </button>
-            <button onClick={nextPage} disabled={!nextButton}
-              className={nextButton ? utilStyles.round: utilStyles.disabledRound}>&#8250;
-            </button>
-          </div>
-          <table id="exportable" className={requestsStyles.requestsTable}>
-            {columnHeaders()}
-            <tbody>
-              {renderTableData()}
-            </tbody>
-          </table>
-          </>
-          : <p className={utilStyles.errorMessage}>No requests.</p>
-        }
-      </div>
-      <RequestModal
-        show={showModal}
-        handleClose={hideModal}
-        user={user}
-        comments={comments || {}}
-      >
-        {currentRequest}
-      </RequestModal>
-    </div>
   )
 }

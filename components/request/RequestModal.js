@@ -24,7 +24,7 @@ export default function RequestModal({ handleClose, show, children, comments, us
     dispatch(createCommentSuccess(post))
     dispatch(updateRequestStatus(children.id))
 
-    const resp = await fetch('http://localhost:3000/api/comments', {
+    const resp = await fetch(`${process.env.API_SERVER}api/comments`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

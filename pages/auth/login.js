@@ -53,7 +53,7 @@ export default function Login() {
 
   const [loginError, setLoginError] = useState(null)
   const handleLogin = async (user) => {
-    const resp = await fetch('http://localhost:3000/api/sessions', {
+    const resp = await fetch(`${process.env.API_SERVER}api/sessions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

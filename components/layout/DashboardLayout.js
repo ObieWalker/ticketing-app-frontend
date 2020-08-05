@@ -17,7 +17,7 @@ export default function DashboardLayout({ children, home }) {
     dispatch(signOutUser())
     cookie.remove('token')
     Router.push('/')
-    const resp = await fetch('http://localhost:3000/api/sessions', {
+    const resp = await fetch(`${process.env.API_SERVER}api/sessions`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',

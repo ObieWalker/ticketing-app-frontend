@@ -36,7 +36,7 @@ export default function MakeRequest() {
 
     dispatch(createRequestSuccess({attributes}))
 
-    const resp = await fetch('http://localhost:3000/api/requests', {
+    const resp = await fetch(`${process.env.API_SERVER}api/requests`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

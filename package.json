@@ -2,6 +2,7 @@
   "name": "ticketing-app-frontend",
   "version": "0.1.0",
   "private": true,
+  "proxy": "https://ticketing-app-frontend.vercel.app/",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

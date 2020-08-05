@@ -73,7 +73,7 @@ export default function ViewRequest() {
     let searchValue = search ? debouncedSearchTerm : ''
     const token = user.token ? user.token : getCookie("token")
     const query = `q=${searchValue}&status=${status}&page=${page}`
-    const resp = await fetch(`http://localhost:3000/api/requests?${query}`, {
+    const resp = await fetch(`${process.env.API_SERVER}requests?${query}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -90,7 +90,7 @@ export default function ViewRequest() {
   }
 
   const getComments = async (id) => {
-    const resp = await fetch(`http://localhost:3000/api/comments?requestId=${id}`, {
+    const resp = await fetch(`${process.env.API_SERVER}api/comments?requestId=${id}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -108,7 +108,7 @@ export default function ViewRequest() {
 
   const generateMonthlyExport = async () => {
     const token = user.token ? user.token : getCookie("token")
-    const resp = await fetch(`http://localhost:3000/api/requests`, {
+    const resp = await fetch(`${process.env.API_SERVER}api/requests`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -130,7 +130,7 @@ export default function ViewRequest() {
   ) => {
     dispatch(setRequestToChange())
     const token = user.token ? user.token : getCookie("token")
-    const resp = await fetch(`http://localhost:3000/api/requests?requestId=${requestId}`, {
+    const resp = await fetch(`${process.env.API_SERVER}api/requests?requestId=${requestId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

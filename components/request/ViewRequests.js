@@ -73,7 +73,7 @@ export default function ViewRequest() {
     let searchValue = search ? debouncedSearchTerm : ''
     const token = user.token ? user.token : getCookie("token")
     const query = `q=${searchValue}&status=${status}&page=${page}`
-    const resp = await fetch(`${process.env.API_SERVER}requests?${query}`, {
+    const resp = await fetch(`${process.env.API_SERVER}api/requests?${query}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

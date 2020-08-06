@@ -118,9 +118,11 @@ export default function ViewRequest() {
       }
     })
     const json = await resp.json()
-    if (json.status == 200){
+    if (json.status == 200 && json.requests.length){
       dispatch(getRequestsSuccess(json.requests))
       setExportState(true)
+    } else {
+      toast.error("Unable to generate CSV export")
     }
   }
 

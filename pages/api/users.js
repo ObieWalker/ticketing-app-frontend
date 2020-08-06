@@ -52,13 +52,18 @@ export default async (req, res) => {
           status: 200,
           total: (all ? meta.total || {} : undefined)
         }
-        res.json(returnObj)
-      } else {
-        res.json({
+        return res.json(returnObj)
+      } 
+      if (error.response) {
+        return res.json({
           message: error.response.data.message,
           status: error.response.status
         })
       }
+      return res.json({
+        message: "There was an error connecting to the server.",
+        status: error.code
+      })
       break
     }
 

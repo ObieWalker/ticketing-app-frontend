@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux'
 import Router from 'next/router'
 import cookie from 'js-cookie';
 import { useFormik } from 'formik';
+import {toast} from 'react-toastify';
 import * as yup from "yup"
 import { setUser } from '../../lib/actions/userActions'
 import LoginForm from '../../components/auth/loginForm'
@@ -48,11 +49,15 @@ export default function Login() {
     if (json.status == 200) {
       dispatch(setUser(json))
       Router.push('/dashboard')
+    } else {
+      toast.error(json.message)
     }
+
   }
 
   const [loginError, setLoginError] = useState(null)
   const handleLogin = async (user) => {
+    console.log(">>>>>>>>>>>>", `${process.env.API_SERVER}api/sessions`)
     const resp = await fetch(`${process.env.API_SERVER}api/sessions`, {
       method: 'POST',
       headers: {
@@ -62,8 +67,10 @@ export default function Login() {
         user: user
       })
     })
+
     const json = await resp.json()
 
+    console.log("json>>>", json)
     if (json.status == 200) {
       dispatch(setUser(json))
       cookie.set("token", json.user.token, { expires: 600 });

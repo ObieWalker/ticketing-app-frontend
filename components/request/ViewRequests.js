@@ -82,6 +82,7 @@ export default function ViewRequest() {
     })
     const json = await resp.json()
 
+    console.log("json requests>>>", json)
     setIsSearching(false);
     if (json.status == 200){
       dispatch(getRequestsSuccess(json.requests))
@@ -308,6 +309,7 @@ export default function ViewRequest() {
     setQueryValues(initialQueryValues)
   }
 
+  console.log("is searching>>>", isSearching)
   return (
     isSearching && !queryValues.search ?
       <span className={utilStyles.tableLoader}>
@@ -335,7 +337,9 @@ export default function ViewRequest() {
                   width={50}
                 />
             }
-            <RadioButtons />
+            <RadioButtons
+              selectStatus={selectStatus}
+            />
             <MonthlyExport
               role={user.role}
               generateMonthlyExport={generateMonthlyExport}

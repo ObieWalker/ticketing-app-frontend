@@ -1,6 +1,6 @@
 import requestsStyles from '../../styles/requests.module.css'
 
-export default function RadioButtons () {
+export default function RadioButtons ({ selectStatus }) {
   return (
     <div name="status" onChange={(e) => selectStatus(e)} className={requestsStyles.radioButtons}>
       <input type="radio" name="status" value="" defaultChecked />

@@ -57,7 +57,6 @@ export default function Login() {
 
   const [loginError, setLoginError] = useState(null)
   const handleLogin = async (user) => {
-    console.log(">>>>>>>>>>>>", `${process.env.API_SERVER}api/sessions`)
     const resp = await fetch(`${process.env.API_SERVER}api/sessions`, {
       method: 'POST',
       headers: {
@@ -70,7 +69,6 @@ export default function Login() {
 
     const json = await resp.json()
 
-    console.log("json>>>", json)
     if (json.status == 200) {
       dispatch(setUser(json))
       cookie.set("token", json.user.token, { expires: 600 });

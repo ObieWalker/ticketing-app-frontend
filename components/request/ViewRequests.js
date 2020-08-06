@@ -82,7 +82,6 @@ export default function ViewRequest() {
     })
     const json = await resp.json()
 
-    console.log("json requests>>>", json)
     setIsSearching(false);
     if (json.status == 200){
       dispatch(getRequestsSuccess(json.requests))
@@ -311,9 +310,8 @@ export default function ViewRequest() {
     setQueryValues(initialQueryValues)
   }
 
-  console.log("is searching>>>", isSearching)
   return (
-    isSearching && !queryValues.search ?
+    isSearching && !queryValues.search && !queryValues.status ?
       <span className={utilStyles.tableLoader}>
         <Loader
           type="Rings"
@@ -330,6 +328,13 @@ export default function ViewRequest() {
             <form className={utilStyles.searchBox}>
               <input type="text" onChange={(e) => search(e)} placeholder="Search by Subject..." name="search"/>
             </form>
+            <RadioButtons
+              selectStatus={selectStatus}
+            />
+            <MonthlyExport
+              role={user.role}
+              generateMonthlyExport={generateMonthlyExport}
+            />
             {
               isSearching &&
                 <Loader
@@ -339,13 +344,6 @@ export default function ViewRequest() {
                   width={50}
                 />
             }
-            <RadioButtons
-              selectStatus={selectStatus}
-            />
-            <MonthlyExport
-              role={user.role}
-              generateMonthlyExport={generateMonthlyExport}
-            />
             { exportState &&
               <div onClick={clearExportState}>
                 <ReactHTMLTableToExcel
